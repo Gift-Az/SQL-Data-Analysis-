@@ -6,3 +6,4 @@ SQL for data analysis refers to the database querying language's ability to inte
 # Content
 * Superstore Time Series Analysis
 * House Property Sales Analysis
+* COVID-19 Data Analysis
