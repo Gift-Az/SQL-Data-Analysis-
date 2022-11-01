@@ -1,5 +1,7 @@
 Superstore Time Series Analysis
-In this notebook we're going to analyse the superstore dataset from Kaggle. 
+In this notebook we're going to analyse the superstore dataset from Kaggle. We have two(2) datasets Superstorestore_1 and Superstore_2 with 21 columns each. 
+Superstore_1 dataset contains data for Row_Id 1-8001. Whilst Superstore_2 dataset contains data for Row_Id 8002-9994
+
 We're going to explore the dataset and find the following:
 
 -Use LEAD windows funtion to create a new column 'SalesNext' that displays the sales value of the next row in the dataset.
@@ -8,3 +10,53 @@ We're going to explore the dataset and find the following:
 -Use common SQL command and aggregate functions to show the monthly and daily sales average.
 -Analyze discounts on 2 consecutive day.
 -Evaluate moving averages using the windows funtion.
+
+
+--JOIN Superstore_1 and Superstore_2 Table 
+SELECT * INTO 
+Superstore FROM SUPERSTORE_1 
+UNION 
+SELECT * FROM superstore_2;
+
+select * from superstore;
+
+--CREATE NEW COLUMN TO DISPLAY THE SALES OF THE NEXT ROW IN THE DATA
+Select	Row_ID, Sales,
+LEAD (Sales, 1, 0)
+OVER(ORDER BY Row_ID) AS SalesNext
+From Superstore;
+
+--CREATE NEW COLUMN TO DISPLAY THE SALES OF THE NEXT PREVIOUS IN THE DATA
+Select	Row_ID, Sales,
+LAG (Sales, 1, 0)
+OVER(ORDER BY Row_ID) AS SalesPrevious
+From Superstore;
+
+--RANK DATA BASED ON SALES 
+Select	Row_ID, Sales,
+RANK ()
+OVER(ORDER BY SALES DESC) AS Sales_Rank
+From Superstore;
+
+--DAILY SALES AVERAGE
+SELECT AVG(Sales) AS Avgsales
+FROM SuperStore;
+
+--MONTHLY SALES AVERAGE
+SELECT AVG(Sales) AS Avgsales, DATENAME(MONTH, Order_Date) Month
+FROM SuperStore
+GROUP BY DATENAME(MONTH, Order_Date)
+ORDER BY Avgsales;
+
+--DISCOUNT ON TWO CONSECUTIVE DAYS
+SELECT Order_date, Sales, Discount
+from Superstore
+WHERE Order_Date between '2014-01-18' AND '2014-01-19'
+
+--MOVING AVERAGE
+SELECT Order_date,TotalSales,  AVG(TotalDiscount)
+OVER(ORDER BY Order_Date ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) TwoDaysMovingAverage
+FROM (
+SELECT SUM(Sales) AS Totalsales, sum(discount) as Totaldiscount, Order_Date
+FROM SuperStore
+group by Order_Date) AS MovingAvg;
